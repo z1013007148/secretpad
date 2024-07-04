@@ -17,18 +17,20 @@
 
 set -e
 
-github_flag=true
+github_flag=false  # 是否用git上的前端代码
 ./scripts/build/build.sh ${github_flag}
+echo "./scripts/build/build.sh ${github_flag} done"
 
-DATETIME=$(date +"%Y%m%d%H%M%S")
-git fetch --tags
-# shellcheck disable=SC2046
-# shellcheck disable=SC2006
-VERSION_TAG="$(git describe --tags $(git rev-list --tags --max-count=1))"
-commit_id=$(git log -n 1 --pretty=oneline | awk '{print $1}' | cut -b 1-6)
-tag=${VERSION_TAG}-${DATETIME}-"${commit_id}"
-local_image=secretpad:${tag}
-echo "$commit_id"
+#DATETIME=$(date +"%Y%m%d%H%M%S")
+#git fetch --tags
+## shellcheck disable=SC2046
+## shellcheck disable=SC2006
+#VERSION_TAG="$(git describe --tags $(git rev-list --tags --max-count=1))"
+#commit_id=$(git log -n 1 --pretty=oneline | awk '{print $1}' | cut -b 1-6)
+#tag=${VERSION_TAG}-${DATETIME}-"${commit_id}"
+#local_image=secretpad:${tag}
+local_image="z1013007148/my_secretpad:v1.4"
+#echo "$commit_id"
 
 BUILDER_EXISTS=$(
 	docker buildx inspect secretpad_image_buildx >/dev/null 2>&1
@@ -43,11 +45,13 @@ else
 	docker buildx create --name secretpad_image_buildx --use
 fi
 
-if [[ "$github_flag" == "true" ]]; then
-	echo "github_flag is true"
-	docker buildx build \
-		--platform linux/arm64,linux/amd64 \
-		--tag "${local_image}" \
-		-f ./build/Dockerfiles/anolis.Dockerfile . \
-		--load
-fi
+
+echo "docker building..."
+docker buildx build \
+  --platform linux/amd64 \
+  --tag "${local_image}" \
+  -f ./build/Dockerfiles/anolis.Dockerfile . \
+  --load
+
+rm -rf ../secretppad-allinone-package/images/my_secretpad.tar
+docker save local_image > ../secretppad-allinone-package/images/my_secretpad.tar

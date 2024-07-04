@@ -14,7 +14,7 @@ secretpad:
     enabled: true
   data:
     host-path: ${HOST_PATH}
-    dir-path: /app/data/
+    dir-path: /mnt/d/project/data/
   datasync:
     center: false
     p2p: true

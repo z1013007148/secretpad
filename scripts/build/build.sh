@@ -34,6 +34,12 @@ if [[ $WITH_FRONTEND_FLAG == true ]]; then
 	mkdir -p "${TARGET_DIR}"
 	cp -rpf $DIST_DIR/* "${TARGET_DIR}"
 	rm -rf "$WORK_DIR"
+else
+  cd ../secretpad-frontend
+  pnpm build
+  rm -rf ../secretpad/secretpad-web/src/main/resources/static
+  cp -r ./apps/platform/dist ../secretpad/secretpad-web/src/main/resources/static
+  cd ../secretpad
 fi
 
 mvn -version
